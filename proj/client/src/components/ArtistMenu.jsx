@@ -6,9 +6,9 @@ const ArtistMenu = (props) => (
     <form>
       <label>Genre: </label>
       <input name="artistGenre" onChange={props.changeInputs} placeholder="EDM, Country, Rock, etc."></input>
-      <label>Artists Like: </label>
+      <label>Music Like: </label>
       <input name="musicLike" onChange={props.changeInputs} placeholder="Illenium, Bon Jovi, etc."></input>
-      <button onClick={props.getNewPlaylists}>Find New Artists!</button>
+      <button onClick={props.getArtistInfo}>Find New Artists!</button>
     </form>
   </div>
 )

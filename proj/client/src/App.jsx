@@ -2,18 +2,20 @@ import React from 'react';
 import axios from 'axios';
 import PlaylistMenu from './components/PlaylistMenu.jsx';
 import ArtistMenu from './components/ArtistMenu.jsx';
+import ArtistResult from './components/ArtistResult.jsx'
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      artistResult: {},
+      artistResults: [],
       playlistResults: {},
       playlistGenre: '',
       playlistArtist: '',
       playlistMenu: true,
       artistGenre: '',
-      musicLike: ''
+      musicLike: '',
+      showArtistResults: false,
     }
     this.getArtistInfo = this.getArtistInfo.bind(this);
     this.changeInputs = this.changeInputs.bind(this);
@@ -93,10 +95,16 @@ class App extends React.Component {
 
   getArtistInfo(event) {
     event.preventDefault();
-    axios.post("/artist")
+    axios.post("/artist", {
+      params: {
+        genre: this.state.artistGenre,
+        artistsLike: this.state.musicLike.split(/[.\-_,]/)
+      }
+    })
     .then((result) => {
       this.setState({
-        artistResult: result.data
+        artistResults: result.data,
+        showArtistResults: !this.state.showArtistResults
       })
     })
   }
@@ -110,23 +118,16 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        {/* <button onClick={this.getInformation}>Generate New Playlist</button>
         <a href="/login">Log In To Spotify</a>
-        <h3>{this.state.artistResult.name}</h3>
-        {this.state.artistResult.images
-        ? <img src={this.state.artistResult.images[0].url}></img>
-        : <h3>No Image!</h3>
-        }
-        {this.state.artistResult.genres
-        ? <h3>{this.state.artistResult.genres[0].toUpperCase()}</h3>
-        : <h3>boo</h3>
-      } */}
         <h3>AudiGen</h3>
         <form>
           <button name="playlist" onClick={this.changeMenu}>Playlist Menu</button>
           <button name="artist" onClick={this.changeMenu}>Artist Menu</button>
         </form>
         {this.showMenu()}
+        {this.state.showArtistResults
+        ? <ArtistResult artist={this.state.artistResults[Math.floor(Math.random() * this.state.artistResults.length)]}/>
+        : <h5>Click Find New Artists to find out what you might be interested in!</h5>}
       </div>
     )
   }

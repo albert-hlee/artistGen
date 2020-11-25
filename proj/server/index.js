@@ -80,11 +80,13 @@ app.post("/artist", (req, res) => {
     if (error) {
       res.send(error);
     } else {
-      helpers.getArtist(result, (error, result) => {
+      helpers.getArtist(result, req.body.params, (error, result) => {
         if (error) {
-          res.send(error);
+          console.log(error.body)
+          // res.send(error);
         } else {
-          res.send(result.data);
+          // console.log(result);
+          res.send(result);
         }
       })
     }
