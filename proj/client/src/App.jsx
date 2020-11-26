@@ -3,6 +3,9 @@ import axios from 'axios';
 import PlaylistMenu from './components/PlaylistMenu.jsx';
 import ArtistMenu from './components/ArtistMenu.jsx';
 import ArtistResult from './components/ArtistResult.jsx'
+import { SpotifyAuth, Scopes } from 'react-spotify-auth';
+import Cookies from 'js-cookie';
+import keys from '../../keys/client.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -16,19 +19,45 @@ class App extends React.Component {
       artistGenre: '',
       musicLike: '',
       showArtistResults: false,
+      currentArtist: null,
     }
     this.getArtistInfo = this.getArtistInfo.bind(this);
     this.changeInputs = this.changeInputs.bind(this);
     this.getNewPlaylists = this.getNewPlaylists.bind(this);
     this.changeMenu = this.changeMenu.bind(this);
     this.showMenu = this.showMenu.bind(this);
+    // this.logIn = this.logIn.bind(this);
   }
 
   // logIn() {
-  //   axios.get("/login")
-  //   .then((result) => {
-  //     console.log(result.data);
-  //   })
+  //   const token = Cookies.get('spotifyAuthToken')
+  //   if (token) {
+  //     return (
+  //       <div>
+  //       <a href="/login">Log In To Spotify</a>
+  //       <h3>AudiGen</h3>
+  //       <form>
+  //         <button name="playlist" onClick={this.changeMenu}>Playlist Menu</button>
+  //         <button name="artist" onClick={this.changeMenu}>Artist Menu</button>
+  //       </form>
+  //       {this.showMenu()}
+  //       {this.state.showArtistResults
+  //       ? <ArtistResult tracks = {this.state.artistResults} artist={this.state.currentArtist}/>
+  //       : <h5>Click Find New Artists to find out what you might be interested in!</h5>}
+  //       {/* {this.state.showPlaylistResults
+  //       ? <PlaylistResult artist={this.state.currentArtist}/>
+  //       : <h5>Click Find New Artists to find out what you might be interested in!</h5>} */}
+  //     </div>
+  //     )
+  //   } else {
+  //     return (
+  //       <SpotifyAuth
+  //       redirectUri={keys.redirect_uri}
+  //       clientID={keys.client_id}
+  //       scopes={[Scopes.userReadPrivate, Scopes.userReadEmail]} // either style will work
+  //       />
+  //     )
+  //   }
   // }
   showMenu() {
     if (this.state.playlistMenu) {
@@ -47,13 +76,14 @@ class App extends React.Component {
     if (event.target.name === "playlist") {
       if (!this.state.playlistMenu) {
         this.setState({
-          playlistMenu: true
+          playlistMenu: true,
+          showArtistResults: false
         })
       }
     } else {
       if (this.state.playlistMenu) {
         this.setState({
-          playlistMenu: false
+          playlistMenu: false,
         })
       }
     }
@@ -103,8 +133,9 @@ class App extends React.Component {
     })
     .then((result) => {
       this.setState({
-        artistResults: result.data,
-        showArtistResults: !this.state.showArtistResults
+        artistResults: result.data.tracks,
+        currentArtist: result.data.artist,
+        showArtistResults: true
       })
     })
   }
@@ -116,9 +147,10 @@ class App extends React.Component {
 
 
   render() {
+    const token = Cookies.get('spotifyAuthToken')
     return (
       <div>
-        <a href="/login">Log In To Spotify</a>
+        {/* <a href="/login">Log In To Spotify</a> */}
         <h3>AudiGen</h3>
         <form>
           <button name="playlist" onClick={this.changeMenu}>Playlist Menu</button>
@@ -126,8 +158,11 @@ class App extends React.Component {
         </form>
         {this.showMenu()}
         {this.state.showArtistResults
-        ? <ArtistResult artist={this.state.artistResults[Math.floor(Math.random() * this.state.artistResults.length)]}/>
+        ? <ArtistResult tracks = {this.state.artistResults} artist={this.state.currentArtist}/>
         : <h5>Click Find New Artists to find out what you might be interested in!</h5>}
+        {/* {this.state.showPlaylistResults
+        ? <PlaylistResult artist={this.state.currentArtist}/>
+        : <h5>Click Find New Artists to find out what you might be interested in!</h5>} */}
       </div>
     )
   }

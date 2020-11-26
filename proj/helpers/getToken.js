@@ -24,17 +24,17 @@ module.exports = {
       callback(error, null);
     })
   },
-  getArtist: (result, params, callback) => {
-    var token = result.data.access_token;
+  getArtists: (access, params, callback) => {
+    var token = access;
     var genre = params.genre;
     var artists = params.artistsLike;
     axios({
       method: 'get',
-      url: `https://api.spotify.com/v1/search?q="${artists[0]}"&type=artist`,
+      url: `https://api.spotify.com/v1/search?q="${artists[Math.floor(Math.random() * artists.length)]}"&type=artist&limit=3`,
       headers: {
         // 'Accept': "application/json",
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
+        'Authorization': 'Bearer ' + access
       },
       json: true
     })
@@ -63,6 +63,24 @@ module.exports = {
   // getPlaylists: (result, callback) => {
 
   // },
+  getArtistTracks: (token, artist, callback) => {
+    axios({
+      method: 'get',
+      url: `https://api.spotify.com/v1/artists/${artist.id}/top-tracks?country=SE`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      json: true
+    })
+    .then(result => {
+      callback(null, result.data.tracks.slice(0, 5));
+    })
+    .catch(error => {
+      callback(error, null);
+    })
+  },
   getTokenForUser: (code, callback) => {
     axios({
       method: 'post',
